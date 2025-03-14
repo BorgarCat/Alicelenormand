@@ -1,0 +1,102 @@
+/* 全局背景 */
+body {
+    background: radial-gradient(circle, #1a1a2e, #16213e, #0f3460);
+    color: #fff;
+    font-family: 'Cinzel', serif;
+    text-align: center;
+}
+
+/* 标题样式 */
+h1 {
+    font-size: 2.8em;
+    text-shadow: 0 0 12px #ff00ff, 0 0 20px #00d4ff;
+    letter-spacing: 2px;
+}
+
+/* 输入框与按钮区域 */
+input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #00d4ff;
+    color: #fff;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    outline: none;
+}
+
+button {
+    background: linear-gradient(45deg, #6a00f4, #ff00ff);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
+}
+
+button:hover {
+    box-shadow: 0 0 20px rgba(255, 0, 255, 1);
+    transform: scale(1.1);
+}
+
+/* 牌面布局 */
+.board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+/* 卡牌样式 */
+.card {
+    width: 100px;
+    height: 150px;
+    margin: 5px;
+    border-radius: 10px;
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.card:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 1);
+}
+
+/* 占位卡牌样式 */
+.card-placeholder {
+    width: 100px;
+    height: 150px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    font-size: 1.5em;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+}
+
+/* 历史记录 */
+#history {
+    max-height: 200px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* 牌面解读 */
+h2 {
+    text-shadow: 0 0 10px #ff00ff, 0 0 15px #00d4ff;
+}

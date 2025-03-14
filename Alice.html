@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alice雷诺曼占卜</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="data.js" defer></script>
+</head>
+<body>
+    <h1>Alice雷诺曼占卜</h1>
+    
+    <div>
+        <label>姓名：</label>
+        <input type="text" id="username" placeholder="请输入姓名">
+        <label>问题：</label>
+        <input type="text" id="question" placeholder="请输入你的问题">
+    </div>
+    
+    <button onclick="drawCards()">🔮 抽牌</button>
+    <button onclick="clearHistory()">🗑 清空记录</button>
+    
+    <div class="board">
+        <div class="row" id="row1"></div>
+        <div class="row" id="row2"></div>
+        <div class="row" id="row3"></div>
+    </div>
+    
+    <h2>牌面解读</h2>
+    <p id="card-info">点击卡牌查看解读</p>
+    
+    <h2>完整解读</h2>
+    <p id="full-interpretation">抽牌后会显示完整解读</p>
+    
+    <h2>历史记录</h2>
+    <ul id="history"></ul>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function drawCards() {
+                let username = document.getElementById('username').value.trim();
+                let question = document.getElementById('question').value.trim();
+                if (!username || !question) {
+                    alert("请输入姓名和问题！");
+                    return;
+                }
+                
+                let allCards = Array.from({ length: 36 }, (_, i) => i + 1);
+                let shuffled = allCards.sort(() => Math.random() - 0.5);
+                let topRow = shuffled.slice(0, 3);
+                let middleRow = shuffled.slice(3, 6);
+                let bottomRow = shuffled.slice(6, 9);
+                let rows = [document.getElementById('row1'), document.getElementById('row2'), document.getElementById('row3')];
+                rows.forEach(row => row.innerHTML = '');
+                
+                let selectedCards = [...topRow, ...middleRow, ...bottomRow];
+                [topRow, middleRow, bottomRow].forEach((group, rowIndex) => {
+                    group.forEach(card => {
+                        let img = document.createElement('img');
+                        img.src = `cards/${card}.png`;
+                        img.className = 'card';
+                        img.draggable = true;
+                        img.dataset.card = card;
+                        img.onerror = function() {
+                            this.onerror = null;
+                            let placeholder = document.createElement('div');
+                            placeholder.className = 'card-placeholder';
+                            placeholder.innerText = card;
+                            placeholder.dataset.card = card;
+                            placeholder.draggable = true;
+                            placeholder.addEventListener('dragstart', dragStart);
+                            placeholder.addEventListener('dragover', dragOver);
+                            placeholder.addEventListener('drop', drop);
+                            placeholder.addEventListener('click', () => showMeaning(card));
+                            this.replaceWith(placeholder);
+                        };
+                        img.addEventListener('click', () => showMeaning(card));
+                        img.addEventListener('dragstart', dragStart);
+                        img.addEventListener('dragover', dragOver);
+                        img.addEventListener('drop', drop);
+                        rows[rowIndex].appendChild(img);
+                    });
+                });
+                
+                saveHistory(username, question, selectedCards);
+                showFullInterpretation(selectedCards);
+            }
+            
+            function showMeaning(card) {
+                let cardInfo = document.getElementById('card-info');
+                if (typeof cardData !== 'undefined' && cardData[card]) {
+                    cardInfo.innerText = `牌 ${card}: ${cardData[card]}`;
+                } else {
+                    cardInfo.innerText = `牌 ${card} 的解释不可用`;
+                }
+            }
+            
+            function showFullInterpretation(cards) {
+                let interpretation = cards.map(card => `牌 ${card}: ${cardData[card] || '解释不可用'}`).join('\n');
+                document.getElementById('full-interpretation').innerText = interpretation;
+            }
+            
+            function saveHistory(username, question, cards) {
+                let history = JSON.parse(localStorage.getItem('history')) || [];
+                let timestamp = new Date().toLocaleString();
+                let newRecord = { time: timestamp, name: username, question: question, cards: cards };
+                history.unshift(newRecord);
+                if (history.length > 50) history.pop();
+                localStorage.setItem('history', JSON.stringify(history));
+                updateHistoryList();
+            }
+            
+            function updateHistoryList() {
+                let historyList = document.getElementById('history');
+                historyList.innerHTML = '';
+                let history = JSON.parse(localStorage.getItem('history')) || [];
+                history.forEach(record => {
+                    let li = document.createElement('li');
+                    li.innerText = `${record.time} | ${record.name} 问：「${record.question}」 -> 上: ${record.cards.slice(0, 3).join(', ')} | 中: ${record.cards.slice(3, 6).join(', ')} | 下: ${record.cards.slice(6, 9).join(', ')}`;
+                    historyList.appendChild(li);
+                });
+            }
+            
+            function clearHistory() {
+                localStorage.removeItem('history');
+                updateHistoryList();
+            }
+            
+            let draggedCard = null;
+            function dragStart(event) {
+                draggedCard = event.target;
+            }
+            function dragOver(event) {
+                event.preventDefault();
+            }
+            function drop(event) {
+                event.preventDefault();
+                if (draggedCard && event.target !== draggedCard && event.target.dataset.card) {
+                    let parent = draggedCard.parentNode;
+                    let target = event.target;
+                    parent.replaceChild(draggedCard, target);
+                    parent.insertBefore(target, draggedCard.nextSibling);
+                }
+            }
+            
+            updateHistoryList();
+            window.drawCards = drawCards;
+            window.clearHistory = clearHistory;
+            window.showMeaning = showMeaning;
+        });
+    </script>
+</body>
+</html>
